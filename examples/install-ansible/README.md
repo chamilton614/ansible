@@ -1,5 +1,6 @@
 # install-ansible
-Example to show how to install ansible package.  Can be used as a template for other packages.
+Example to show how to install ansible from a playbook.
 
 hosts - this file is for example purposes, non-production ready
+
 ansible.cfg - this file is for example purposes, non-production ready
