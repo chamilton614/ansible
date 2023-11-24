@@ -1,0 +1,39 @@
+---
+# vim: set ft=ansible et ts=2 sw=2:
+#
+# Create a new VM from a template using the new vmware_guest module
+- name: Delete VM
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    vcenter_username: administrator@vsphere.local
+    vcenter_password: P@ssw0rd
+    vcenter_hostname: 192.168.2.5
+    esxi_hostname: 192.168.2.3
+    vm_name: rhel8_blank
+    vm_folder_path: /Datacenter/vm/Templates
+    dumpfacts: False
+  tasks:
+    #- name: Check for required variables
+    #  fail: msg="Must pass name and group to -e"
+    #  when: name is not defined or group is not defined
+    #- name: Check for vSphere access parameters
+    #  fail: msg="Must set vcenter_user and vcenter_pass in a Vault"
+    #  when: (vcenter_user is not defined) or (vcenter_pass is not defined)
+      
+    - name: Delete VM
+      community.vmware.vmware_guest:
+        validate_certs: False
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ esxi_hostname }}"
+        name: "{{ vm_name }}"
+        folder: "{{ vm_folder_path }}"
+        # Set this to false to remove from inventory and delete from disk
+        delete_from_inventory: false
+        state: absent
+      delegate_to: localhost
+      register: deletevm                                                 
+        
