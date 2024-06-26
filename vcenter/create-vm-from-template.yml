@@ -7,14 +7,9 @@
   gather_facts: false
   connection: local
   vars:
-    vcenter_hostname: vcsa.box
-    esxhost: esx1.box
-    datastore: datastore1
-    network: "VMnetwork"
-    vmtemplate: CentOS7-Base
-    vmcluster: LAN
-    notes: Created by Ansible
     dumpfacts: False
+  vars_files:
+    vars.yml
   tasks:
     - name: Check for required variables
       fail: msg="Must pass name and group to -e"
@@ -33,6 +28,12 @@
         datacenter: BOX
         name: "{{ name }}"
         template: "{{ vmtemplate }}"
+        cdrom:
+          - controller_number: 0
+            controller_type: "sata"
+            state: "present"
+            type: "client"
+            unit_number: 0
         disk:
           - size_gb: 10
             type: thin

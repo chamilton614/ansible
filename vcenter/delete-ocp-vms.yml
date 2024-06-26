@@ -1,0 +1,74 @@
+---
+# vim: set ft=ansible et ts=2 sw=2:
+#
+# example usage:
+# ansible-playbook delete-ocp-vms.yml
+#
+# Delete VMs using the vmware_guest module
+- name: Delete OCP VMs
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    dumpfacts: False
+  vars_files:
+    vars.yml
+  tasks:
+    #- name: Check for required variables
+    #  fail: msg="Must pass name and group to -e"
+    #  when: name is not defined or group is not defined
+    #- name: Check for vSphere access parameters
+    #  fail: msg="Must set vcenter_user and vcenter_pass in a Vault"
+    #  when: (vcenter_user is not defined) or (vcenter_pass is not defined)
+      
+    - name: OCP Bootstrap & Master VMs
+      community.vmware.vmware_guest:
+        validate_certs: False
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ esxi_hostname }}"
+        name: "{{ item }}"
+        folder: "/Datacenter/vm/{{ vm_folder_ocp }}"
+        # Set this to false to remove from inventory and delete from disk
+        delete_from_inventory: false
+        state: absent
+      delegate_to: localhost
+      register: deletevm
+      with_items: "{{ ocp_master }}"
+      when: use_ocp_master == "true"
+
+    - name: OCP Other VMs
+      community.vmware.vmware_guest:
+        validate_certs: False
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ esxi_hostname }}"
+        name: "{{ item }}"
+        folder: "/Datacenter/vm/{{ vm_folder_ocp }}"
+        # Set this to false to remove from inventory and delete from disk
+        delete_from_inventory: false
+        state: absent
+      delegate_to: localhost
+      register: deletevm
+      with_items: "{{ ocp_other }}"
+      when: use_ocp_other == "true"
+
+    - name: OCP Storage VMs
+      community.vmware.vmware_guest:
+        validate_certs: False
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        esxi_hostname: "{{ esxi_hostname }}"
+        name: "{{ item }}"
+        folder: "/Datacenter/vm/{{ vm_folder_ocp }}"
+        # Set this to false to remove from inventory and delete from disk
+        delete_from_inventory: false
+        state: absent
+      delegate_to: localhost
+      register: deletevm
+      with_items: "{{ ocp_storage }}"
+      when: use_ocp_storage == "true"                                            
+        

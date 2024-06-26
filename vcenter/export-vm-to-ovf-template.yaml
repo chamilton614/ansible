@@ -2,10 +2,14 @@
 # vim: set ft=ansible et ts=2 sw=2:
 #
 # example usage:
-# ansible-playbook -e vm_name="rhel9_blank" -e vm_folder="Templates" delete-vm.yml
+# ansible-playbook -e vm_name="rhel9_blank" -e vm_folder="Templates" \
+# -e vm_cpu="1" \
+# -e vm_memory="4096" \
+# -e vm_disk_size="100" \
+# create-blank-vm.yml
 #
-# Create a new VM from a template using the new vmware_guest module
-- name: Delete VM
+# Export a VM to an OVF template using the vmware_guest module
+- name: Export VMs
   hosts: localhost
   gather_facts: false
   connection: local
@@ -21,18 +25,20 @@
     #  fail: msg="Must set vcenter_user and vcenter_pass in a Vault"
     #  when: (vcenter_user is not defined) or (vcenter_pass is not defined)
       
-    - name: Delete VM
-      community.vmware.vmware_guest:
+    - name: Export VM to OVF Template
+      community.vmware.vmware_export_ovf:
         validate_certs: False
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
-        esxi_hostname: "{{ esxi_hostname }}"
-        name: "{{ vm_name }}"
-        folder: "/Datacenter/vm/{{ vm_folder }}"
-        # Set this to false to remove from inventory and delete from disk
-        delete_from_inventory: false
-        state: absent
+        datacenter: "{{ vmdatacenter }}"
+        download_timeout: 300
+        name: "{{ item }}"
+        folder: "/Datacenter/vm/{{ vm_folder_for_export }}"
+        export_with_images: false
+        #Default appends a directory with VM Name to this path
+        export_dir: "{{ export_vm_path }}"
       delegate_to: localhost
-      register: deletevm                                                 
+      #register: newvm
+      with_items: "{{ export_vm_list }}"
         

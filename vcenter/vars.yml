@@ -1,0 +1,69 @@
+#These are the Default variables and values used by the playbooks
+#Variables specified on the commandline will take precedence over these values
+vcenter_username: administrator@vsphere.local
+vcenter_password: P@ssw0rd!123
+vcenter_hostname: 192.168.2.5
+esxi_hostname: 192.168.2.3
+datastore: datastore2
+network: "Non-OCP"
+vmtemplate: CentOS7-Base
+guest_os_shortname: rhel9_64Guest
+vmcluster: Cluster
+vmdatacenter: Datacenter
+vm_name: rhel9_blank
+#Assumes prefixed folder path /Datacenter/vm/
+vm_folder: Templates
+vm_cpu: 1
+vm_memory: 4096
+vm_disk_size: 100
+notes: Created by Ansible Playbook
+
+######################################################
+#Clone VM to New VM Specific Variables to be used below
+clone_vm_list:
+  - fnadw2k22vm
+
+destination_vm_folder: OCP
+destination_vm_name: ocpadw2k22vm
+######################################################
+
+######################################################
+#Export VM to OVF Specific Variables to be used below
+#VM Folder where VMs reside
+vm_folder_for_export: FileNet
+#List of VM Names to be exported for multiple exports
+export_vm_list:
+  - fnadw2k22vm
+
+#Local Path to store the Export VMs
+export_vm_path: /data/Files/VMs/Active_Directory
+######################################################
+#OCP Specific Variables to be used below
+vm_folder_ocp: OCP
+
+#OCP Bootstrap and Masters
+use_ocp_master: "false"
+vm_cpu_ocp_master: 4
+vm_memory_ocp_master: 24576
+vm_disk_size_ocp_master: 120
+ocp_master:
+  - ocpbootstrap
+  - ocpmaster1
+  - ocpmaster2
+  - ocpmaster3
+
+#OCP Other
+use_ocp_other: "true"
+vm_cpu_ocp_other: 1
+vm_memory_ocp_other: 8192
+vm_disk_size_ocp_other: 120
+ocp_other:
+  - ocplb
+
+#OCP Storage
+use_ocp_storage: "true"
+vm_cpu_ocp_storage: 1
+vm_memory_ocp_storage: 8192
+vm_disk_size_ocp_storage: 1024
+ocp_storage:
+  - ocpnfs

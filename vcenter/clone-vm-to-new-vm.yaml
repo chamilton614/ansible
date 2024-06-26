@@ -1,0 +1,48 @@
+---
+# vim: set ft=ansible et ts=2 sw=2:
+#
+# example usage:
+# ansible-playbook -e vm_name="rhel9_blank" -e vm_folder="Templates" \
+# -e vm_cpu="1" \
+# -e vm_memory="4096" \
+# -e vm_disk_size="100" \
+# create-blank-vm.yml
+#
+# Clone a VM to a New VM using the vmware_guest module
+- name: Clone VMs
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    dumpfacts: False
+  vars_files:
+    vars.yml
+  tasks:
+    #- name: Check for required variables
+    #  fail: msg="Must pass name and group to -e"
+    #  when: name is not defined or group is not defined
+    #- name: Check for vSphere access parameters
+    #  fail: msg="Must set vcenter_user and vcenter_pass in a Vault"
+    #  when: (vcenter_user is not defined) or (vcenter_pass is not defined)
+      
+    - name: Clone VM to New VM
+      community.vmware.vmware_guest_cross_vc_clone:
+        validate_certs: false
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        timeout: 3600
+        name: "{{ item }}"
+        destination_vm_name: '{{ destination_vm_name }}'
+        destination_vcenter: '{{ vcenter_hostname }}'
+        destination_vcenter_username: '{{ vcenter_username }}'
+        destination_vcenter_password: '{{ vcenter_password }}'
+        destination_host: '{{ esxi_hostname }}'
+        destination_datastore: '{{ datastore }}'
+        destination_vm_folder: '{{ destination_vm_folder }}'
+        destination_vcenter_validate_certs: false
+        state: present
+      delegate_to: localhost
+      #register: newvm
+      with_items: "{{ clone_vm_list }}"
+        
